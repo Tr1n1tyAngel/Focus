@@ -9,6 +9,9 @@ public class GameManager : MonoBehaviour
     public GameObject menuPanel;
     public GameObject profilePanel;
     public GameObject testPanel;
+    public string playerName;
+    public string playerSurname;
+    public string playerYearOfBirth;
     //Profile screen variables
     public Image characterImage;
     public Sprite playerChosenImage;
@@ -31,7 +34,10 @@ public class GameManager : MonoBehaviour
     private bool isMoving = false;
 
     //Test screen variables
-
+    public Image profileImage;
+    public TMP_InputField profileName;
+    public TMP_InputField profileSurname;
+    public TMP_InputField profileYOB;
 
     void Start()
     {
@@ -125,12 +131,17 @@ public class GameManager : MonoBehaviour
 
     public void SaveProfile()
     {
-        string playerName = nameInputField.text;
-        string playerSurname = surnameInputField.text;
-        string playerYearOfBirth = yearOfBirthInputField.text;
-        playerChosenImage = characterSprites[currentImageIndex];
+        playerName = nameInputField.text;
+        playerSurname = surnameInputField.text;
+        playerYearOfBirth = yearOfBirthInputField.text;
         profilePanel.SetActive(false);
         testPanel.SetActive(true);
+        profileName.text = playerName;
+        profileSurname.text = playerSurname;
+        profileYOB.text = playerYearOfBirth;
+        playerChosenImage = characterSprites[currentImageIndex];
+        profileImage.sprite = playerChosenImage;
+        
        
         Debug.Log($"Profile Saved: {playerName} {playerSurname}, Born in {playerYearOfBirth}");
     }
