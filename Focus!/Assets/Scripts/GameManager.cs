@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour
     public TMP_Text timerText;
     public bool startTimer = false;
     private float timerDuration = 300f; // 5 minutes in seconds
-    private float timerRemaining;
+    public float timerRemaining;
 
     void Start()
     {
@@ -119,9 +119,12 @@ public class GameManager : MonoBehaviour
             timerRemaining -= Time.deltaTime;
             UpdateTimerDisplay();
         }
-        if(timerRemaining <= 0f)
+        if(timerRemaining <= 1f)
         {
-            eventOccur = 10f;
+            CancelInvoke();
+            timerRemaining = 1f;
+            timerText.text = "Time Remaining: 00:01";
+
         }
         if(testStart)
         {
