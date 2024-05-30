@@ -4,12 +4,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public GameObject menuPanel;
     public GameObject profilePanel;
     public GameObject testPanel;
+    public GameObject endPanel;
     public string playerName;
     public string playerSurname;
     public string playerYearOfBirth;
@@ -73,10 +75,14 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        AudioManager.Instance.PlayMusic(0);
+        AudioManager.Instance.musicVolume=0.1f;
         startButtonRectTransform = startButton.GetComponent<RectTransform>();
+        endPanel.SetActive(false);
         menuPanel.SetActive(true);
         profilePanel.SetActive(false);
         testPanel.SetActive(false);
+        
         isMoving = false;
         foreach(GameObject gameobject in valid)
         {
@@ -119,7 +125,8 @@ public class GameManager : MonoBehaviour
         }
         if(testStart)
         {
-            InvokeRepeating("InvokeRandomMethod", 0f, eventOccur);
+            InvokeRepeating("InvokeRandomTestChange", 0f, 5f);
+            InvokeRepeating("InvokeRandomPopup", 0f, 3f);
             testStart = false;
         }
     }
@@ -133,6 +140,7 @@ public class GameManager : MonoBehaviour
 
     public void gameStart()
     {
+        AudioManager.Instance.PlaySFX(3);
         if (!isMoving)
         {
             isMoving = true;
@@ -141,12 +149,25 @@ public class GameManager : MonoBehaviour
         {
             menuPanel.SetActive(false);
             profilePanel.SetActive(true);
+            AudioManager.Instance.StopMusic();
+            AudioManager.Instance.PlayMusic(1);
+            AudioManager.Instance.musicVolume = 1f;
             isMoving = false;
         }
     }
 
+    public void gameRestart()
+    {
+        for (int i = 0; i <= validCheck.Length - 1; i++)
+        {
+            validCheck[i] = false;
+        }
+        endPanel.SetActive(false);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
     public void Quit()
     {
+        AudioManager.Instance.PlaySFX(3);
         Application.Quit();
     }
     //Button Move Methods
@@ -176,6 +197,7 @@ public class GameManager : MonoBehaviour
     //Profile Screen Methods
     public void ShowPreviousImage()
     {
+        AudioManager.Instance.PlaySFX(3);
         if (characterSprites.Count == 0) return;
         if (profilePanel.activeSelf)
         {
@@ -192,6 +214,7 @@ public class GameManager : MonoBehaviour
 
     public void ShowNextImage()
     {
+        AudioManager.Instance.PlaySFX(3);
         if (characterSprites.Count == 0) return;
         if(profilePanel.activeSelf)
         {
@@ -208,6 +231,7 @@ public class GameManager : MonoBehaviour
 
     public void SaveProfile()
     {
+        AudioManager.Instance.PlaySFX(3);
         playerName = nameInputField.text;
         playerSurname = surnameInputField.text;
         playerYearOfBirth = yearOfBirthInputField.text;
@@ -223,9 +247,9 @@ public class GameManager : MonoBehaviour
 
         Debug.Log($"Profile Saved: {playerName} {playerSurname}, Born in {playerYearOfBirth}");
     }
-    void InvokeRandomMethod()
+    void InvokeRandomTestChange()
     {
-        int randomIndex = Random.Range(0, 5);
+        int randomIndex = Random.Range(0, 3);
         switch (randomIndex)
         {
             case 0:
@@ -240,11 +264,19 @@ public class GameManager : MonoBehaviour
                 ClearQuestion();
                 Debug.Log("questionchange");
                 break;
-            case 3:
+            
+        }
+    }
+    void InvokeRandomPopup()
+    {
+        int randomIndex = Random.Range(0, 2);
+        switch (randomIndex)
+        {
+            case 0:
                 Advert();
                 Debug.Log("advertpopup");
                 break;
-            case 4:
+            case 1:
                 AnnoyingSound();
                 Debug.Log("annoyingsound");
                 break;
@@ -265,6 +297,7 @@ public class GameManager : MonoBehaviour
     }
     void ChangeProfileDetails()
     {
+
         int rnd = Random.Range(0, 3);
         switch(rnd)
         {
@@ -339,6 +372,7 @@ public class GameManager : MonoBehaviour
     }
     void Advert()
     {
+        AudioManager.Instance.PlaySFX(2);
         if (panelPrefab != null && canvas != null)
         {
             // Instantiate the panel prefab
@@ -469,6 +503,7 @@ public class GameManager : MonoBehaviour
     }
     public void CloseAdvert(GameObject panel)
     {
+        AudioManager.Instance.PlaySFX(3);
         if (panel != null)
         {
             spawnedPanels.Remove(panel);
@@ -530,27 +565,32 @@ public class GameManager : MonoBehaviour
     }
     public void dogClose()
     {
+        AudioManager.Instance.PlaySFX(3);
         dogPanel.SetActive(false);
         dogBark.Stop();
     }
     public void doorClose()
     {
+        AudioManager.Instance.PlaySFX(3);
         doorKnockPanel.SetActive(false);
         doorKnock.Stop();
     }
     public void shoutClose()
     {
+        AudioManager.Instance.PlaySFX(3);
         shoutPanel.SetActive(false);
         shout.Stop();
     }
     public void garbageClose()
     {
+        AudioManager.Instance.PlaySFX(3);
         garbageTruckPanel.SetActive(false);
         garbageTruck.Stop();
     }
     public void Submit()
     {
-        if(profileImage.sprite != playerChosenImage)
+        AudioManager.Instance.PlaySFX(3);
+        if (profileImage.sprite != playerChosenImage)
         {
             valid[0].SetActive(true);
         }
@@ -642,6 +682,17 @@ public class GameManager : MonoBehaviour
         bool allTrue = validCheck.All(b => b);
         if(allTrue)
         {
+            CancelInvoke();
+            AudioManager.Instance.StopMusic();
+            AudioManager.Instance.PlayMusic(0);
+            AudioManager.Instance.musicVolume=0.1f;
+            testPanel.SetActive(false);
+            dogPanel.SetActive(false);
+            doorKnockPanel.SetActive(false);
+            shoutPanel.SetActive(false);
+            garbageTruckPanel.SetActive(false);
+            endPanel.SetActive(true);
+
             Debug.Log("Test Completed");
         }
         else
